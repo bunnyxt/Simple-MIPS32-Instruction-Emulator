@@ -42,8 +42,20 @@
 
                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Name="RestartButton" Content="重启模拟" Margin="0,0,0,4" Click="RestartButton_Click"/>
 
-                <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,4">
-                    tmp
+                <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="InstructionsListView" Margin="0,0,0,4">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding AssemblyCode}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="指令" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
                 </ListView>
 
                 <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"  Orientation="Horizontal" Margin="0,0,0,4">
