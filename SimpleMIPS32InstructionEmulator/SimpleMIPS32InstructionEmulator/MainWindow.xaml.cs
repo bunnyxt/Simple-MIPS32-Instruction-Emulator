@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace SimpleMIPS32InstructionEmulator
         RAM ram;
         ObservableCollection<Instruction> instructions;
         ObservableCollection<Register> registers;
+        private object account_id;
 
         public MainWindow()
         {
@@ -111,6 +113,7 @@ namespace SimpleMIPS32InstructionEmulator
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("程序文件导入失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                ProgrameFilePathTextBox.Text = "";
                 return;
             }
         }
@@ -128,7 +131,7 @@ namespace SimpleMIPS32InstructionEmulator
                 if (dialogResult == System.Windows.Forms.DialogResult.OK && openFileDialog.FileName != null)
                 {
                     dataFilePath = openFileDialog.FileName;
-                    ProgrameFilePathTextBox.Text = dataFilePath;
+                    DataFilePathTextBox.Text = dataFilePath;
                 }
                 else
                 {
@@ -138,6 +141,7 @@ namespace SimpleMIPS32InstructionEmulator
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("数据文件导入失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                DataFilePathTextBox.Text = "";
                 return;
             }
         }
@@ -165,6 +169,11 @@ namespace SimpleMIPS32InstructionEmulator
                 programeFile.Read(programeFileBytes, 0, (int)programeFile.Length);
                 programeFileContent = Encoding.Default.GetString(programeFileBytes);
 
+                //ignore annotation
+                string pattern = @"(/\*)((.|\n)*)(\*/)";
+                Regex rgx = new Regex(pattern);
+                programeFileContent = rgx.Replace(programeFileContent, " ");
+
                 int count = 0, address = 1000 / 4;
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in programeFileContent)
@@ -189,6 +198,7 @@ namespace SimpleMIPS32InstructionEmulator
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("加载程序文件出错！请检查文件是否有效！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                ProgrameFilePathTextBox.Text = "";
                 return;
             }
         }
@@ -205,6 +215,11 @@ namespace SimpleMIPS32InstructionEmulator
                 dataFileBytes = new byte[dataFile.Length];
                 dataFile.Read(dataFileBytes, 0, (int)dataFile.Length);
                 dataFileContent = Encoding.Default.GetString(dataFileBytes);
+
+                //ignore annotation
+                string pattern = @"(/\*)((.|\n)*)(\*/)";
+                Regex rgx = new Regex(pattern);
+                dataFileContent = rgx.Replace(dataFileContent, " ");
 
                 int count = 0, address = 2000 / 4;
                 StringBuilder tmpSB = new StringBuilder();
@@ -227,6 +242,7 @@ namespace SimpleMIPS32InstructionEmulator
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("加载数据文件出错！请检查文件是否有效！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                DataFilePathTextBox.Text = "";
                 return;
             }
         }
