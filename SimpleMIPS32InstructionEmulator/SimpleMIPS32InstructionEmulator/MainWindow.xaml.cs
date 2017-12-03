@@ -158,6 +158,8 @@ namespace SimpleMIPS32InstructionEmulator
 
         public void LoadPrograme(string programeFilePath)
         {
+            instructions.Clear();
+
             //save programe into address begin from 1000
             FileStream programeFile;
             byte[] programeFileBytes;
@@ -284,55 +286,71 @@ namespace SimpleMIPS32InstructionEmulator
                 {
                     case (0x20):
                         //add
-                        assemblyCode = String.Format("add ${0},${1},${2}", rs, rt, rd);
+                        assemblyCode = String.Format("add ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x21):
                         //addu
+                        assemblyCode = String.Format("addu ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x22):
                         //sub
+                        assemblyCode = String.Format("sub ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x23):
                         //subu
+                        assemblyCode = String.Format("subu ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x24):
                         //and
+                        assemblyCode = String.Format("and ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x25):
                         //or
+                        assemblyCode = String.Format("or ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x26):
                         //xor
+                        assemblyCode = String.Format("xor ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x27):
                         //nor
+                        assemblyCode = String.Format("nor ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x2A):
                         //slt
+                        assemblyCode = String.Format("slt ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x2B):
                         //sltu
+                        assemblyCode = String.Format("sltu ${0},${1},${2}", rd, rs, rt);
                         break;
                     case (0x00):
                         //sll
+                        assemblyCode = String.Format("sll ${0},${1},{2}", rd, rt, shamt);
                         break;
                     case (0x02):
                         //srl
+                        assemblyCode = String.Format("srl ${0},${1},{2}", rd, rt, shamt);
                         break;
                     case (0x03):
                         //sra
+                        assemblyCode = String.Format("sra ${0},${1},{2}", rd, rt, shamt);
                         break;
                     case (0x04):
                         //sllv
+                        assemblyCode = String.Format("sllv ${0},${1},${2}", rd, rt, rs);
                         break;
                     case (0x06):
                         //srlv
+                        assemblyCode = String.Format("srlv ${0},${1},${2}", rd, rt, rs);
                         break;
                     case (0x07):
                         //srav
+                        assemblyCode = String.Format("srav ${0},${1},${2}", rd, rt, rs);
                         break;
                     case (0x08):
                         //jr
+                        assemblyCode = String.Format("jr ${0}", rs);
                         break;
                     default:
                         break;
@@ -341,12 +359,14 @@ namespace SimpleMIPS32InstructionEmulator
             else if (op == (0x2))
             {
                 //J-type instruction j
-                uint immediate = (machineCode & (0x03FFFFFF)) >> 0;
+                uint address = (machineCode & (0x03FFFFFF)) >> 0;
+                assemblyCode = String.Format("j ${0}", address);
             }
             else if (op == (0x03))
             {
                 //J-type instruction jal
-                uint immediate = (machineCode & (0x03FFFFFF)) >> 0;
+                uint address = (machineCode & (0x03FFFFFF)) >> 0;
+                assemblyCode = String.Format("jal ${0}", address);
             }
             else
             {
@@ -358,39 +378,51 @@ namespace SimpleMIPS32InstructionEmulator
                 {
                     case (0x08):
                         //addi
+                        assemblyCode = String.Format("addi ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x09):
                         //addiu
+                        assemblyCode = String.Format("addiu ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0C):
                         //andi
+                        assemblyCode = String.Format("andi ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0D):
                         //ori
+                        assemblyCode = String.Format("ori ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0E):
                         //xori
+                        assemblyCode = String.Format("xori ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0F):
                         //lui
+                        assemblyCode = String.Format("lui ${0},{1}", rt, immediate);
                         break;
                     case (0x23):
                         //lw
+                        assemblyCode = String.Format("lw ${0},{1}({2})", rt, immediate, rs);
                         break;
                     case (0x2B):
                         //sw
+                        assemblyCode = String.Format("sw ${0},{1}({2})", rt, immediate, rs);
                         break;
                     case (0x04):
                         //beq
+                        assemblyCode = String.Format("beq ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x05):
                         //bne
+                        assemblyCode = String.Format("bne ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0A):
                         //slti
+                        assemblyCode = String.Format("slti ${0},${1},{2}", rt, rs, immediate);
                         break;
                     case (0x0B):
                         //sltiu
+                        assemblyCode = String.Format("sltiu ${0},${1},{2}", rt, rs, immediate);
                         break;
                     default:
                         break;
