@@ -4,13 +4,27 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace SimpleMIPS32InstructionEmulator
 {
-    public class RAM
+    public class RAM : INotifyPropertyChanged
     {
-        public int Size { get; }
-        public uint[] Storage { get; set; }
+        private int size;
+
+        public int Size
+        {
+            get { return size; }
+            set { size = value; OnPropertyChanged(new PropertyChangedEventArgs("Size")); }
+        }
+
+        private uint[] storage;
+
+        public uint[] Storage
+        {
+            get { return storage; }
+            set { storage = value; OnPropertyChanged(new PropertyChangedEventArgs("Storage")); }
+        }
 
         public RAM()
         {
@@ -85,6 +99,13 @@ namespace SimpleMIPS32InstructionEmulator
             address %= this.Size;//modify those address which exceed max RAM size
             Storage[address / 4] = target;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
     }
 
     public class Instruction : INotifyPropertyChanged
@@ -153,4 +174,31 @@ namespace SimpleMIPS32InstructionEmulator
             PropertyChanged?.Invoke(this, e);
         }
     }
+
+    public class Watch : INotifyPropertyChanged
+    {
+        private int address;
+
+        public int Address
+        {
+            get { return address; }
+            set { address = value; OnPropertyChanged(new PropertyChangedEventArgs("Address")); }
+        }
+
+        private TextBlock value;
+
+        public TextBlock Value
+        {
+            get { return value; }
+            set { this.value = value; }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+    }
+
 }

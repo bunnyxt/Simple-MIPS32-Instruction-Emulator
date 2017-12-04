@@ -117,7 +117,47 @@
                 <TextBlock Text="内存查看"/>
             </GroupBox.Header>
 
+            <Grid Margin="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
+                <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Name="RAMWatchListView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Address}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="内存地址" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto"  DisplayMemberBinding="{Binding Value.FlowDirection}">
+                                <!-->TODO  fix binding source<-->
+                                    <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="值" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="地址：" VerticalAlignment="Center" Margin="0,4,4,0"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="InputAddressTextBox" HorizontalAlignment="Stretch" Margin="0,4,8,0"/>
+                <Button Grid.Row="1" Grid.Column="2" Name="AddWatchButton" Content="添加" Margin="0,4,0,0" Click="AddWatchButton_Click"/>
+            </Grid>
         </GroupBox>
     </Grid>
 </Window>

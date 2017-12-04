@@ -27,6 +27,7 @@ namespace SimpleMIPS32InstructionEmulator
         RAM ram;
         ObservableCollection<Instruction> instructions;
         ObservableCollection<Register> registers;
+        ObservableCollection<Watch> watches;
 
         public MainWindow()
         {
@@ -37,10 +38,12 @@ namespace SimpleMIPS32InstructionEmulator
             instructions = new ObservableCollection<Instruction>();
             registers = new ObservableCollection<Register>();
             InitializeRegisters(ref registers);
+            watches = new ObservableCollection<Watch>();
 
             //set data binding
             RegistersListView.ItemsSource = registers;
             InstructionsListView.ItemsSource = instructions;
+            RAMWatchListView.ItemsSource = watches;
         }
 
         private void InitializeRegisters(ref ObservableCollection<Register> registers)
@@ -139,6 +142,9 @@ namespace SimpleMIPS32InstructionEmulator
                 {
                     throw new Exception();
                 }
+
+                //load data to ram
+                LoadData(dataFilePath);
             }
             catch (Exception ex)
             {
@@ -156,6 +162,30 @@ namespace SimpleMIPS32InstructionEmulator
         private void NextStepButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void AddWatchButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //TODO  fix binding
+                Watch watch = new Watch();
+                watch.Address = Convert.ToInt32(InputAddressTextBox.Text);
+                TextBlock textBlock = new TextBlock();
+                System.Windows.Data.Binding bind = new System.Windows.Data.Binding();
+                bind.Source = ram;
+                bind.Path = new PropertyPath("Storage[" + InputAddressTextBox.Text + "]");
+                bind.Mode = BindingMode.OneWay;
+                textBlock.SetBinding(System.Windows.Controls.TextBox.TextProperty, bind);
+                watch.Value = textBlock;
+                watches.Add(watch);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("查看添加失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                InputAddressTextBox.Text = "";
+                return;
+            }
         }
 
         public void LoadPrograme(string programeFilePath)
@@ -182,7 +212,7 @@ namespace SimpleMIPS32InstructionEmulator
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in programeFileContent)
                 {
-                    if (item >= '0' && item <= '9')
+                    if (item >= '0' && item <= '1')
                     {
                         tmpSB.Append(item);
                         count++;
@@ -230,13 +260,13 @@ namespace SimpleMIPS32InstructionEmulator
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in dataFileContent)
                 {
-                    if (item >= '0' && item <= '9')
+                    if (item >= '0' && item <= '1')
                     {
                         tmpSB.Append(item);
                         count++;
                         if (count == 32)
                         {
-                            uint data = Convert.ToUInt32(tmpSB.ToString());
+                            uint data = ConvertFromBinaryStringToUInt(tmpSB.ToString());
                             ram.Set4Bit(address, data);
                             address += 4;
                             count = 0;
@@ -641,5 +671,6 @@ namespace SimpleMIPS32InstructionEmulator
             }
             return u;
         }
+
     }
 }
