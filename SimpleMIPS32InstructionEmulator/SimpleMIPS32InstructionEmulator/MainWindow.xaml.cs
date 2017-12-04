@@ -161,23 +161,20 @@ namespace SimpleMIPS32InstructionEmulator
                 int addressStart = address - address % 4;
                 int addressEnd = addressStart + 3;
                 watch.Address = String.Format("{0}~{1}", addressStart, addressEnd);
-                TextBlock textBlock = new TextBlock();
-                System.Windows.Data.Binding bind = new System.Windows.Data.Binding();
-                bind.Source = ram;
-                bind.Path = new PropertyPath("Storage[" + (addressStart / 4) + "]");
-                bind.Mode = BindingMode.OneWay;
-                textBlock.SetBinding(TextBlock.TextProperty, bind);
-                watch.Value = textBlock;
+                foreach (var item in watches)
+                {
+                    if (item.Address == watch.Address)
+                    {
+                        return;
+                    }
+                }
                 watches.Add(watch);
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("查看添加失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                InputAddressTextBox.Text = "";
                 return;
-            }
-            finally
-            {
-                //InputAddressTextBox.Text = "";
             }
         }
 
@@ -190,6 +187,27 @@ namespace SimpleMIPS32InstructionEmulator
             bind.Mode = BindingMode.OneWay;
             textBlock.SetBinding(TextBlock.TextProperty, bind);
             InputAddressTextBox.Text = "";
+        }
+
+        private void InnerDeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.Button button = (System.Windows.Controls.Button)sender;
+            StackPanel stackPanel = (StackPanel)button.Parent;
+            TextBlock textBlock = (TextBlock)stackPanel.Children[1];
+            string address = textBlock.Text;
+            foreach (var item in watches)
+            {
+                if (item.Address == address)
+                {
+                    watches.Remove(item);
+                    break;
+                }
+            }
+        }
+
+        private void ClearWatchButton_Click(object sender, RoutedEventArgs e)
+        {
+            watches.Clear();
         }
 
         public void LoadPrograme(string programeFilePath)

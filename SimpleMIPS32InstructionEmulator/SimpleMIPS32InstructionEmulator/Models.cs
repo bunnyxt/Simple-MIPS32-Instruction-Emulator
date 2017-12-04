@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -18,18 +19,22 @@ namespace SimpleMIPS32InstructionEmulator
             set { size = value; OnPropertyChanged(new PropertyChangedEventArgs("Size")); }
         }
 
-        private uint[] storage;
+        private ObservableCollection<uint> storage;
 
-        public uint[] Storage
+        public ObservableCollection<uint> Storage
         {
             get { return storage; }
-            set { storage = value; OnPropertyChanged(new PropertyChangedEventArgs("Storage")); }
+            set { storage = value; OnPropertyChanged(new PropertyChangedEventArgs("Storage")); }//So how to trigger event when element in Storage changed??
         }
 
         public RAM()
         {
             this.Size = 1048576;//1 MB RAM
-            this.Storage = new uint[262144];
+            this.Storage = new ObservableCollection<uint>();
+            for (int i = 0; i < 262144; i++)
+            {
+                this.Storage.Add(new uint());
+            }
         }
 
         public byte Get1Bit(int address)
@@ -183,14 +188,6 @@ namespace SimpleMIPS32InstructionEmulator
         {
             get { return address; }
             set { address = value; OnPropertyChanged(new PropertyChangedEventArgs("Address")); }
-        }
-
-        private TextBlock value;
-
-        public TextBlock Value
-        {
-            get { return value; }
-            set { this.value = value; OnPropertyChanged(new PropertyChangedEventArgs("Value")); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

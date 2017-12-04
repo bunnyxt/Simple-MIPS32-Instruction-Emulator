@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SimpleMIPS32InstructionEmulator"
         mc:Ignorable="d"
-        Title="MIPS32指令集模拟器" Height="420" Width="648">
+        Title="MIPS32指令集模拟器" Height="420" MinHeight="420" Width="680" MinWidth="680">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -126,9 +126,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Name="RAMWatchListView">
+                <ListView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Name="RAMWatchListView">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Address}">
@@ -150,7 +151,17 @@
                                 </GridViewColumnHeader>
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock Name="InnerTextBlock" Loaded="InnerTextBlock_Loaded"/>
+                                        <TextBlock Name="InnerTextBlock" VerticalAlignment="Center" Margin="0,0,4,0" Loaded="InnerTextBlock_Loaded"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Name="InnerDeleteButton" Content="删除" Click="InnerDeleteButton_Click"/>
+                                            <TextBlock Text="{Binding Address}" Visibility="Collapsed"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
@@ -158,9 +169,10 @@
                     </ListView.View>
                 </ListView>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="地址：" VerticalAlignment="Center" Margin="0,4,4,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="地址：" VerticalAlignment="Center" Margin="0,4,0,0"/>
                 <TextBox Grid.Row="1" Grid.Column="1" Name="InputAddressTextBox" HorizontalAlignment="Stretch" Margin="0,4,8,0"/>
-                <Button Grid.Row="1" Grid.Column="2" Name="AddWatchButton" Content="添加" Margin="0,4,0,0" Click="AddWatchButton_Click"/>
+                <Button Grid.Row="1" Grid.Column="2" Name="AddWatchButton" Content="添加" Margin="0,4,4,0" Click="AddWatchButton_Click"/>
+                <Button Grid.Row="1" Grid.Column="3" Name="ClearWatchButton" Content="清空" Margin="0,4,0,0" Click="ClearWatchButton_Click"/>
             </Grid>
         </GroupBox>
     </Grid>
