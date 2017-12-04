@@ -112,9 +112,6 @@ namespace SimpleMIPS32InstructionEmulator
 
             //initialize NextInstructionTextBlock
             NextInstructionTextBlock.Text = Decode(ram.Get4Bit(Convert.ToInt32(registers[32].Value)));
-
-            ProgrameFilePathTextBox.Text = "";
-
         }
 
         private void ImportDataButton_Click(object sender, RoutedEventArgs e)
@@ -137,9 +134,6 @@ namespace SimpleMIPS32InstructionEmulator
 
             //load data to ram
             LoadData(dataFilePath);
-
-
-            DataFilePathTextBox.Text = "";
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
@@ -150,6 +144,26 @@ namespace SimpleMIPS32InstructionEmulator
         private void NextStepButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void NumOriTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                uint num = Convert.ToUInt32(NumOriTextBox.Text);
+                NumBinTextBox.Text = Convert.ToString(num, 2).PadLeft(32, '0');
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(28, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(24, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(20, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(16, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(12, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(8, " ");
+                NumBinTextBox.Text = NumBinTextBox.Text.Insert(4, " ");
+            }
+            catch
+            {
+                return;
+            }
         }
 
         private void AddWatchButton_Click(object sender, RoutedEventArgs e)

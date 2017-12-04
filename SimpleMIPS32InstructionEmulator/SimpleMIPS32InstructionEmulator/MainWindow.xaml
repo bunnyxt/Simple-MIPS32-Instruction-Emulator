@@ -77,39 +77,53 @@
                 <TextBlock Text="寄存器"/>
             </GroupBox.Header>
 
-            <ListView Name="RegistersListView" Margin="4">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Id}">
-                            <GridViewColumnHeader>
-                                <GridViewColumnHeader.ContentTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="编号" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </GridViewColumnHeader.ContentTemplate>
-                            </GridViewColumnHeader>
-                        </GridViewColumn>
-                        <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Name}">
-                            <GridViewColumnHeader>
-                                <GridViewColumnHeader.ContentTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="名称" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </GridViewColumnHeader.ContentTemplate>
-                            </GridViewColumnHeader>
-                        </GridViewColumn>
-                        <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Value}">
-                            <GridViewColumnHeader>
-                                <GridViewColumnHeader.ContentTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="值" VerticalAlignment="Center" MinWidth="80"/>
-                                    </DataTemplate>
-                                </GridViewColumnHeader.ContentTemplate>
-                            </GridViewColumnHeader>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <Grid Margin="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <ListView Grid.Row="0" Name="RegistersListView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Id}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="编号" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Name}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="名称" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Value}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="值" VerticalAlignment="Center" MinWidth="80"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <TextBlock Grid.Row="1" Text="无符号数转二进制：" Margin="0,4,0,0"/>
+                <TextBox Grid.Row="2" Name="NumOriTextBox" Margin="0,4,0,0" TextChanged="NumOriTextBox_TextChanged"/>
+                <TextBox Grid.Row="3" Name="NumBinTextBox" Margin="0,4,0,0"/>
+            </Grid>
+
         </GroupBox>
 
         <GroupBox Grid.Column="2" Margin="4">
@@ -145,7 +159,7 @@
                                 <GridViewColumnHeader>
                                     <GridViewColumnHeader.ContentTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="值" VerticalAlignment="Center" MinWidth="80"/>
+                                            <TextBlock Text="值" VerticalAlignment="Center" MinWidth="84"/>
                                         </DataTemplate>
                                     </GridViewColumnHeader.ContentTemplate>
                                 </GridViewColumnHeader>
