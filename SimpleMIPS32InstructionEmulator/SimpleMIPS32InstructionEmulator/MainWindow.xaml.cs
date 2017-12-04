@@ -91,36 +91,30 @@ namespace SimpleMIPS32InstructionEmulator
             string programeFilePath;
 
             //select file saving path
-            try
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text Files(*.txt)|*.txt|All Files(*.*)|*.*";
+            DialogResult dialogResult = openFileDialog.ShowDialog();
+            if (dialogResult == System.Windows.Forms.DialogResult.OK && openFileDialog.FileName != null)
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Text Files(*.txt)|*.txt|All Files(*.*)|*.*";
-                DialogResult dialogResult = openFileDialog.ShowDialog();
-                if (dialogResult == System.Windows.Forms.DialogResult.OK && openFileDialog.FileName != null)
-                {
-                    programeFilePath = openFileDialog.FileName;
-                    ProgrameFilePathTextBox.Text = programeFilePath;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-
-                //load programe to ram
-                LoadPrograme(programeFilePath);
-
-                //initialize PC
-                registers[32].Value = 1024;
-
-                //initialize NextInstructionTextBlock
-                NextInstructionTextBlock.Text = Decode(ram.Get4Bit(Convert.ToInt32(registers[32].Value)));
+                programeFilePath = openFileDialog.FileName;
+                ProgrameFilePathTextBox.Text = programeFilePath;
             }
-            catch (Exception ex)
+            else
             {
-                System.Windows.MessageBox.Show("程序文件导入失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
-                ProgrameFilePathTextBox.Text = "";
                 return;
             }
+
+            //load programe to ram
+            LoadPrograme(programeFilePath);
+
+            //initialize PC
+            registers[32].Value = 1024;
+
+            //initialize NextInstructionTextBlock
+            NextInstructionTextBlock.Text = Decode(ram.Get4Bit(Convert.ToInt32(registers[32].Value)));
+
+            ProgrameFilePathTextBox.Text = "";
+
         }
 
         private void ImportDataButton_Click(object sender, RoutedEventArgs e)
@@ -128,30 +122,24 @@ namespace SimpleMIPS32InstructionEmulator
             string dataFilePath;
 
             //select file saving path
-            try
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Text Files(*.txt)|*.txt|All Files(*.*)|*.*";
+            DialogResult dialogResult = openFileDialog.ShowDialog();
+            if (dialogResult == System.Windows.Forms.DialogResult.OK && openFileDialog.FileName != null)
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Text Files(*.txt)|*.txt|All Files(*.*)|*.*";
-                DialogResult dialogResult = openFileDialog.ShowDialog();
-                if (dialogResult == System.Windows.Forms.DialogResult.OK && openFileDialog.FileName != null)
-                {
-                    dataFilePath = openFileDialog.FileName;
-                    DataFilePathTextBox.Text = dataFilePath;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-
-                //load data to ram
-                LoadData(dataFilePath);
+                dataFilePath = openFileDialog.FileName;
+                DataFilePathTextBox.Text = dataFilePath;
             }
-            catch (Exception ex)
+            else
             {
-                System.Windows.MessageBox.Show("数据文件导入失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
-                DataFilePathTextBox.Text = "";
                 return;
             }
+
+            //load data to ram
+            LoadData(dataFilePath);
+
+
+            DataFilePathTextBox.Text = "";
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
@@ -168,24 +156,40 @@ namespace SimpleMIPS32InstructionEmulator
         {
             try
             {
-                //TODO  fix binding
                 Watch watch = new Watch();
-                watch.Address = Convert.ToInt32(InputAddressTextBox.Text);
+                int address = Convert.ToInt32(InputAddressTextBox.Text);
+                int addressStart = address - address % 4;
+                int addressEnd = addressStart + 3;
+                watch.Address = String.Format("{0}~{1}", addressStart, addressEnd);
                 TextBlock textBlock = new TextBlock();
                 System.Windows.Data.Binding bind = new System.Windows.Data.Binding();
                 bind.Source = ram;
-                bind.Path = new PropertyPath("Storage[" + InputAddressTextBox.Text + "]");
+                bind.Path = new PropertyPath("Storage[" + (addressStart / 4) + "]");
                 bind.Mode = BindingMode.OneWay;
-                textBlock.SetBinding(System.Windows.Controls.TextBox.TextProperty, bind);
+                textBlock.SetBinding(TextBlock.TextProperty, bind);
                 watch.Value = textBlock;
                 watches.Add(watch);
             }
             catch (Exception ex)
             {
                 System.Windows.MessageBox.Show("查看添加失败！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
-                InputAddressTextBox.Text = "";
                 return;
             }
+            finally
+            {
+                //InputAddressTextBox.Text = "";
+            }
+        }
+
+        private void InnerTextBlock_Loaded(object sender, RoutedEventArgs e)
+        {
+            TextBlock textBlock = (TextBlock)sender;
+            System.Windows.Data.Binding bind = new System.Windows.Data.Binding();
+            bind.Source = ram;
+            bind.Path = new PropertyPath("Storage[" + (Convert.ToInt32(InputAddressTextBox.Text) / 4) + "]");
+            bind.Mode = BindingMode.OneWay;
+            textBlock.SetBinding(TextBlock.TextProperty, bind);
+            InputAddressTextBox.Text = "";
         }
 
         public void LoadPrograme(string programeFilePath)
@@ -671,6 +675,5 @@ namespace SimpleMIPS32InstructionEmulator
             }
             return u;
         }
-
     }
 }

@@ -102,7 +102,7 @@
                             <GridViewColumnHeader>
                                 <GridViewColumnHeader.ContentTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="值" VerticalAlignment="Center" MinWidth="60"/>
+                                        <TextBlock Text="值" VerticalAlignment="Center" MinWidth="80"/>
                                     </DataTemplate>
                                 </GridViewColumnHeader.ContentTemplate>
                             </GridViewColumnHeader>
@@ -140,15 +140,19 @@
                                     </GridViewColumnHeader.ContentTemplate>
                                 </GridViewColumnHeader>
                             </GridViewColumn>
-                            <GridViewColumn Width="Auto"  DisplayMemberBinding="{Binding Value.FlowDirection}">
-                                <!-->TODO  fix binding source<-->
-                                    <GridViewColumnHeader>
+                            <GridViewColumn Width="Auto">
+                                <GridViewColumnHeader>
                                     <GridViewColumnHeader.ContentTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="值" VerticalAlignment="Center"/>
+                                            <TextBlock Text="值" VerticalAlignment="Center" MinWidth="80"/>
                                         </DataTemplate>
                                     </GridViewColumnHeader.ContentTemplate>
                                 </GridViewColumnHeader>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Name="InnerTextBlock" Loaded="InnerTextBlock_Loaded"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                         </GridView>
                     </ListView.View>

@@ -177,9 +177,9 @@ namespace SimpleMIPS32InstructionEmulator
 
     public class Watch : INotifyPropertyChanged
     {
-        private int address;
+        private string address;
 
-        public int Address
+        public string Address
         {
             get { return address; }
             set { address = value; OnPropertyChanged(new PropertyChangedEventArgs("Address")); }
@@ -190,7 +190,7 @@ namespace SimpleMIPS32InstructionEmulator
         public TextBlock Value
         {
             get { return value; }
-            set { this.value = value; }
+            set { this.value = value; OnPropertyChanged(new PropertyChangedEventArgs("Value")); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
