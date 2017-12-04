@@ -27,7 +27,6 @@ namespace SimpleMIPS32InstructionEmulator
         RAM ram;
         ObservableCollection<Instruction> instructions;
         ObservableCollection<Register> registers;
-        private object account_id;
 
         public MainWindow()
         {
@@ -108,7 +107,10 @@ namespace SimpleMIPS32InstructionEmulator
                 LoadPrograme(programeFilePath);
 
                 //initialize PC
-                registers[32].Value = 1000;
+                registers[32].Value = 1024;
+
+                //initialize NextInstructionTextBlock
+                NextInstructionTextBlock.Text = Decode(ram.Get4Bit(Convert.ToInt32(registers[32].Value)));
             }
             catch (Exception ex)
             {
@@ -160,7 +162,7 @@ namespace SimpleMIPS32InstructionEmulator
         {
             instructions.Clear();
 
-            //save programe into address begin from 1000
+            //save programe into address begin from 1024
             FileStream programeFile;
             byte[] programeFileBytes;
             string programeFileContent;
@@ -172,11 +174,11 @@ namespace SimpleMIPS32InstructionEmulator
                 programeFileContent = Encoding.Default.GetString(programeFileBytes);
 
                 //ignore annotation
-                string pattern = @"(/\*)((.|\n)*)(\*/)";
+                string pattern = @"(/\*)((.|\n)*?)(\*/)";
                 Regex rgx = new Regex(pattern);
                 programeFileContent = rgx.Replace(programeFileContent, " ");
 
-                int count = 0, address = 1000 / 4;
+                int count = 0, address = 1024;
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in programeFileContent)
                 {
@@ -190,7 +192,8 @@ namespace SimpleMIPS32InstructionEmulator
                             instruction.MachineCode = ConvertFromBinaryStringToUInt(tmpSB.ToString());
                             instruction.AssemblyCode = Decode(instruction.MachineCode);
                             instructions.Add(instruction);
-                            ram.Set4Bit(address++, instruction.MachineCode);
+                            ram.Set4Bit(address, instruction.MachineCode);
+                            address += 4;
                             count = 0;
                             tmpSB.Clear();
                         }
@@ -207,7 +210,7 @@ namespace SimpleMIPS32InstructionEmulator
 
         public void LoadData(string dataFilePath)
         {
-            //save data into address begin from 2000
+            //save data into address begin from 2048
             FileStream dataFile;
             byte[] dataFileBytes;
             string dataFileContent;
@@ -219,11 +222,11 @@ namespace SimpleMIPS32InstructionEmulator
                 dataFileContent = Encoding.Default.GetString(dataFileBytes);
 
                 //ignore annotation
-                string pattern = @"(/\*)((.|\n)*)(\*/)";
+                string pattern = @"(/\*)((.|\n)*?)(\*/)";
                 Regex rgx = new Regex(pattern);
                 dataFileContent = rgx.Replace(dataFileContent, " ");
 
-                int count = 0, address = 2000 / 4;
+                int count = 0, address = 2048;
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in dataFileContent)
                 {
@@ -234,7 +237,8 @@ namespace SimpleMIPS32InstructionEmulator
                         if (count == 32)
                         {
                             uint data = Convert.ToUInt32(tmpSB.ToString());
-                            ram.Set4Bit(address++, data);
+                            ram.Set4Bit(address, data);
+                            address += 4;
                             count = 0;
                             tmpSB.Clear();
                         }
@@ -271,7 +275,7 @@ namespace SimpleMIPS32InstructionEmulator
 
         public string Decode(uint machineCode)
         {
-            //TODO  decode machineCode to assemblyCode
+            //decode machineCode to assemblyCode
             string assemblyCode = "";
             uint op = machineCode >> 26;
             if (op == (0x0))
@@ -431,10 +435,211 @@ namespace SimpleMIPS32InstructionEmulator
             return assemblyCode;
         }
 
+        //TODO test and finish return false
         public bool Execute(uint machineCode)
         {
-            //TODO  execute instruction
+            //execute instruction
+            uint op = machineCode >> 26;
+            if (op == (0x0))
+            {
+                //R-type instructions
+                uint rs = (machineCode & (0x03E00000)) >> 21;
+                uint rt = (machineCode & (0x001F0000)) >> 16;
+                uint rd = (machineCode & (0x0000F800)) >> 11;
+                uint shamt = (machineCode & (0x000007C0)) >> 6;
+                uint func = (machineCode & (0x0000003F)) >> 0;
+                switch (func)
+                {
+                    case (0x20):
+                        //add
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rs].Value + (int)registers[(int)rt].Value);
+                        break;
+                    case (0x21):
+                        //addu
+                        registers[(int)rd].Value = registers[(int)rs].Value + registers[(int)rt].Value;
+                        break;
+                    case (0x22):
+                        //sub
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rs].Value - (int)registers[(int)rt].Value);
+                        break;
+                    case (0x23):
+                        //subu
+                        registers[(int)rd].Value = registers[(int)rs].Value - registers[(int)rt].Value;
+                        break;
+                    case (0x24):
+                        //and
+                        registers[(int)rd].Value = registers[(int)rs].Value & registers[(int)rt].Value;
+                        break;
+                    case (0x25):
+                        //or
+                        registers[(int)rd].Value = registers[(int)rs].Value | registers[(int)rt].Value;
+                        break;
+                    case (0x26):
+                        //xor
+                        registers[(int)rd].Value = registers[(int)rs].Value ^ registers[(int)rt].Value;
+                        break;
+                    case (0x27):
+                        //nor
+                        registers[(int)rd].Value = ~(registers[(int)rs].Value | registers[(int)rt].Value);
+                        break;
+                    case (0x2A):
+                        //slt
+                        if ((int)registers[(int)rs].Value < (int)registers[(int)rt].Value)
+                        {
+                            registers[(int)rd].Value = 1;
+                        }
+                        else
+                        {
+                            registers[(int)rd].Value = 0;
+                        }
+                        break;
+                    case (0x2B):
+                        //sltu
+                        if (registers[(int)rs].Value < registers[(int)rt].Value)
+                        {
+                            registers[(int)rd].Value = 1;
+                        }
+                        else
+                        {
+                            registers[(int)rd].Value = 0;
+                        }
+                        break;
+                    case (0x00):
+                        //sll
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value << (int)shamt);
+                        break;
+                    case (0x02):
+                        //srl
+                        //TODO  change to logical mode
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)shamt);
+                        break;
+                    case (0x03):
+                        //sra
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)shamt);
+                        break;
+                    case (0x04):
+                        //sllv
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value << (int)registers[(int)rs].Value);
+                        break;
+                    case (0x06):
+                        //srlv
+                        //TODO  change to logical mode
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)registers[(int)rs].Value);
+                        break;
+                    case (0x07):
+                        //srav
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)registers[(int)rs].Value);
+                        break;
+                    case (0x08):
+                        //jr
+                        registers[32].Value = registers[(int)rs].Value;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (op == (0x2))
+            {
+                //J-type instruction j
+                uint address = (machineCode & (0x03FFFFFF)) >> 0;
+                //TODO
+            }
+            else if (op == (0x03))
+            {
+                //J-type instruction jal
+                uint address = (machineCode & (0x03FFFFFF)) >> 0;
+                //TODO
+            }
+            else
+            {
+                //I-type instructions
+                uint rs = (machineCode & (0x03E00000)) >> 21;
+                uint rt = (machineCode & (0x001F0000)) >> 16;
+                uint immediate = (machineCode & (0x0000FFFF)) >> 0;
+                switch (op)
+                {
+                    case (0x08):
+                        //addi
+                        registers[(int)rt].Value = (uint)((int)registers[(int)rs].Value + (int)SignExtend(immediate));
+                        break;
+                    case (0x09):
+                        //addiu
+                        registers[(int)rt].Value = (uint)((int)registers[(int)rs].Value + (int)immediate);
+                        break;
+                    case (0x0C):
+                        //andi
+                        registers[(int)rt].Value = (uint)((int)registers[(int)rs].Value & (int)immediate);
+                        break;
+                    case (0x0D):
+                        //ori
+                        registers[(int)rt].Value = (uint)((int)registers[(int)rs].Value | (int)immediate);
+                        break;
+                    case (0x0E):
+                        //xori
+                        registers[(int)rt].Value = (uint)((int)registers[(int)rs].Value ^ (int)immediate);
+                        break;
+                    case (0x0F):
+                        //lui
+                        registers[(int)rt].Value = (uint)(((int)immediate) << 16);
+                        break;
+                    case (0x23):
+                        //lw
+                        registers[(int)rt].Value = ram.Get4Bit((int)(registers[(int)rs].Value + SignExtend(immediate)));
+                        break;
+                    case (0x2B):
+                        //sw
+                        ram.Set4Bit((int)(registers[(int)rs].Value + SignExtend(immediate)), registers[(int)rt].Value);
+                        break;
+                    case (0x04):
+                        //beq
+                        if (registers[(int)rs].Value == registers[(int)rt].Value)
+                        {
+                            registers[32].Value = registers[32].Value + 4 + (SignExtend(immediate) << 2);
+                        }
+                        break;
+                    case (0x05):
+                        //bne
+                        if (registers[(int)rs].Value != registers[(int)rt].Value)
+                        {
+                            registers[32].Value = registers[32].Value + 4 + (SignExtend(immediate) << 2);
+                        }
+                        break;
+                    case (0x0A):
+                        //slti
+                        if (registers[(int)rs].Value < SignExtend(immediate))
+                        {
+                            registers[(int)rt].Value = 1;
+                        }
+                        else
+                        {
+                            registers[(int)rt].Value = 0;
+                        }
+                        break;
+                    case (0x0B):
+                        //sltiu
+                        if (registers[(int)rs].Value < immediate)
+                        {
+                            registers[(int)rt].Value = 1;
+                        }
+                        else
+                        {
+                            registers[(int)rt].Value = 0;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
             return true;
+        }
+
+        private uint SignExtend(uint u)
+        {
+            if (((u & (0x00008000)) >> 15) == 1)
+            {
+                u += (0xFFFF0000);
+            }
+            return u;
         }
     }
 }
