@@ -138,7 +138,21 @@ namespace SimpleMIPS32InstructionEmulator
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
         {
+            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("确定清空所有数据，重新开始？", "警告", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            if (messageBoxResult == MessageBoxResult.OK)
+            {
+                ram = new RAM();
+                InitializeRegisters(ref registers);
+                instructions.Clear();
+                watches.Clear();
 
+                NowInstructionTextBlock.Text = "";
+                NextInstructionTextBlock.Text = "";
+                ProgrameFilePathTextBox.Text = "";
+                DataFilePathTextBox.Text = "";
+                NumOriTextBox.Text = "0";
+                NumBinTextBox.Text = "0000 0000 0000 0000 0000 0000 0000 0000";
+            }
         }
 
         private void NextStepButton_Click(object sender, RoutedEventArgs e)

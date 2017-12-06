@@ -120,8 +120,8 @@
                 </ListView>
 
                 <TextBlock Grid.Row="1" Text="无符号数转二进制：" Margin="0,4,0,0"/>
-                <TextBox Grid.Row="2" Name="NumOriTextBox" Margin="0,4,0,0" TextChanged="NumOriTextBox_TextChanged"/>
-                <TextBox Grid.Row="3" Name="NumBinTextBox" Margin="0,4,0,0"/>
+                <TextBox Grid.Row="2" Name="NumOriTextBox" Text="0" Margin="0,4,0,0" TextChanged="NumOriTextBox_TextChanged"/>
+                <TextBox Grid.Row="3" Name="NumBinTextBox" Text="0000 0000 0000 0000 0000 0000 0000 0000" Margin="0,4,0,0"/>
             </Grid>
 
         </GroupBox>
