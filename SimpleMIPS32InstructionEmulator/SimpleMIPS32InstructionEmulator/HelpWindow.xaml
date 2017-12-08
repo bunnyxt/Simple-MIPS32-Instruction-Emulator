@@ -1,0 +1,70 @@
+﻿<Window x:Class="SimpleMIPS32InstructionEmulator.HelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SimpleMIPS32InstructionEmulator"
+        mc:Ignorable="d"
+        Title="使用说明" Height="588" Width="476" ResizeMode="NoResize">
+
+    <StackPanel Margin="12" Width="432">
+        <TextBlock FontSize="20" Margin="0,0,0,4">
+            MIPS32指令集模拟器
+        </TextBlock>
+        <TextBlock>
+            ver. 1.0.0.0
+        </TextBlock>
+
+        <Rectangle Width="250" Height="1" Fill="Black" Margin="0,8,0,8" HorizontalAlignment="Left"/>
+
+        <TextBlock TextWrapping="Wrap" Margin="0,0,0,4">
+            本模拟器可读取MIPS32指令集的部分指令与数据，存放入模拟内存中，并模拟CPU对指令进行解析、执行（读取、修改相应寄存器、存储器中的值），并设置有指令译码模块、模拟寄存器查看模块、模拟内存查询模块，方便观察与验证指令执行的正确性。
+        </TextBlock>
+
+        <Rectangle Width="250" Height="1" Fill="Black" Margin="0,8,0,8" HorizontalAlignment="Left"/>
+
+        <TextBlock TextWrapping="Wrap">
+            本模拟器的模拟内存大小为1MB，有效地址为0~1048575，超过该数值的地址将会做取余处理后继续使用（如：地址1048576%1048576=0，对地址1048576的操作即为对地址0的操作）。
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap">
+            本模拟器只支持部分MIPS32指令，具体如下：add，addu，sub，subu，and，or，xor，nor，slt，sltu，sll，srl，sra，sllv，srlv，srav，jr，addi，addiu，andi，ori，xori，lui，lw，sw，beq，bne，slti，sltiu，j，jal共31条。
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap">
+            本模拟器读取的MIPS32指令与数据为存放在.txt文件中的机器码，即由“0”与“1”组成的二进制数（例：000000 00100 00100 00101 00000 100000），而非汇编代码（诸如add $5,$4,$4）。文件中允许添加其他字符（例如空格、换行等），但是不会被读入。另外，可以使用“/* */”形式添加注释，可查看本程序附带的TestPrograme.txt与TestData.txt了解格式。
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap">
+            本模拟器默认代码段导入地址为1024，数据段导入地址为2048，可以在左上角更改，但请注意，该地址必须为4的倍数，不满足该要求的数值会被自动调整为不超过该数值的最大的4的倍数。
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap">
+            本模拟器考虑到MIPS32指令集的特殊性，指令长度为4个字节，操作数也多为4字节32位二进制数，故在内存查看模块不提供查看某一个字节的内存内容选项，而是每次查看4个字节内存内容。对于该4字节，满足高对高、低对低原则。
+        </TextBlock>
+        <TextBlock TextWrapping="Wrap">
+            本模拟器中寄存器值与内存单元的值显示的为该32位二进制数对应的无符号整型数值，可以通过本模拟器中下方的转换器进行转换，查看寄存器或内存具体二进制“0”与“1”的存放情况。
+        </TextBlock>
+
+        <Rectangle Width="250" Height="1" Fill="Black" Margin="0,8,0,8" HorizontalAlignment="Left"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Margin="0,0,8,0">
+                by.bunnyxt
+            </TextBlock>
+            <TextBlock>
+                2017.12.8
+            </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock>
+                <Hyperlink NavigateUri="http://www.bunnyxt.com" Click="WebHyperlink_Click">
+                    www.bunnyxt.com
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock>
+                <Hyperlink NavigateUri="https://github.com/bunnyxt/Simple-MIPS32-Instruction-Emulator" Click="WebHyperlink_Click">
+                    GitHub
+                </Hyperlink>
+            </TextBlock>
+        </StackPanel>
+    </StackPanel>
+</Window>

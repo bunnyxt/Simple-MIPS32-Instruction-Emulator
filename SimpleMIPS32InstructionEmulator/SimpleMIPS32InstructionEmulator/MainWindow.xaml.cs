@@ -262,6 +262,12 @@ namespace SimpleMIPS32InstructionEmulator
             watches.Clear();
         }
 
+        private void HelpPageHyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            HelpWindow helpWindow = new HelpWindow();
+            helpWindow.Show();
+        }
+
         public void LoadPrograme(string programeFilePath)
         {
             instructions.Clear();
