@@ -107,9 +107,6 @@ namespace SimpleMIPS32InstructionEmulator
             //load programe to ram
             LoadPrograme(programeFilePath);
 
-            //initialize PC
-            registers[32].Value = 1024;
-
             //initialize NextInstructionTextBlock
             NextInstructionTextBlock.Text = Decode(ram.Get4Bit(Convert.ToInt32(registers[32].Value)));
         }
@@ -146,6 +143,8 @@ namespace SimpleMIPS32InstructionEmulator
                 instructions.Clear();
                 watches.Clear();
 
+                ProgrameStartAddressTextBox.Text = "1024";
+                DataStartAddressTextBox.Text = "2048";
                 NowInstructionTextBlock.Text = "";
                 NextInstructionTextBlock.Text = "";
                 ProgrameFilePathTextBox.Text = "";
@@ -157,7 +156,32 @@ namespace SimpleMIPS32InstructionEmulator
 
         private void NextStepButton_Click(object sender, RoutedEventArgs e)
         {
+            uint nowInstruction = ram.Get4Bit((int)registers[32].Value);
 
+            if (nowInstruction == 0)
+            {
+                System.Windows.MessageBox.Show("程序执行完成！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            NowInstructionTextBlock.Text = Decode(nowInstruction);
+            foreach (Instruction item in InstructionsListView.Items)
+            {
+                if (item.Address == (int)registers[32].Value)
+                {
+                    InstructionsListView.SelectedItem = item;
+                }
+            }
+
+            if (!Execute(nowInstruction))
+            {
+                System.Windows.MessageBox.Show("执行出错！请检查代码是否正确或者是否导入了本模拟器不支持的指令。\n错误代码：" + nowInstruction, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                NextInstructionTextBlock.Text = "";
+                return;
+            }
+
+            uint nextInstruction = ram.Get4Bit((int)registers[32].Value);
+            NextInstructionTextBlock.Text = Decode(nextInstruction);
         }
 
         private void NumOriTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -242,7 +266,30 @@ namespace SimpleMIPS32InstructionEmulator
         {
             instructions.Clear();
 
-            //save programe into address begin from 1024
+            //get programe start address(default:1024)
+            int programeStartAddress = 0;
+
+            try
+            {
+                programeStartAddress = Convert.ToInt32(ProgrameStartAddressTextBox.Text);
+                if (programeStartAddress % 4 != 0)
+                {
+                    programeStartAddress = programeStartAddress - programeStartAddress % 4;
+                    ProgrameStartAddressTextBox.Text = programeStartAddress.ToString();
+                    System.Windows.MessageBox.Show("代码段导入首地址必须为4的倍数！已自动修改为不大于输入地址的最大的4的倍数！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("代码段导入首地址出错！请检查是否有效！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                ProgrameStartAddressTextBox.Text = "1024";
+                return;
+            }
+
+            //initialize PC
+            registers[32].Value = (uint)programeStartAddress;
+
+            //save programe into address begin from programeStartAddress
             FileStream programeFile;
             byte[] programeFileBytes;
             string programeFileContent;
@@ -258,7 +305,7 @@ namespace SimpleMIPS32InstructionEmulator
                 Regex rgx = new Regex(pattern);
                 programeFileContent = rgx.Replace(programeFileContent, " ");
 
-                int count = 0, address = 1024;
+                int count = 0;
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in programeFileContent)
                 {
@@ -271,9 +318,10 @@ namespace SimpleMIPS32InstructionEmulator
                             Instruction instruction = new Instruction();
                             instruction.MachineCode = ConvertFromBinaryStringToUInt(tmpSB.ToString());
                             instruction.AssemblyCode = Decode(instruction.MachineCode);
+                            instruction.Address = programeStartAddress;
                             instructions.Add(instruction);
-                            ram.Set4Bit(address, instruction.MachineCode);
-                            address += 4;
+                            ram.Set4Bit(programeStartAddress, instruction.MachineCode);
+                            programeStartAddress += 4;
                             count = 0;
                             tmpSB.Clear();
                         }
@@ -290,7 +338,27 @@ namespace SimpleMIPS32InstructionEmulator
 
         public void LoadData(string dataFilePath)
         {
-            //save data into address begin from 2048
+            //get data start address(default:2048)
+            int dataStartAddress = 0;
+
+            try
+            {
+                dataStartAddress = Convert.ToInt32(DataStartAddressTextBox.Text);
+                if (dataStartAddress % 4 != 0)
+                {
+                    dataStartAddress = dataStartAddress - dataStartAddress % 4;
+                    DataStartAddressTextBox.Text = dataStartAddress.ToString();
+                    System.Windows.MessageBox.Show("数据段导入首地址必须为4的倍数！已自动修改为不大于输入地址的最大的4的倍数！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("数据段导入首地址出错！请检查是否有效！\n详细信息：" + ex.Message, "警告", MessageBoxButton.OK, MessageBoxImage.Error);
+                DataStartAddressTextBox.Text = "2048";
+                return;
+            }
+
+            //save data into address begin from dataStartAddress
             FileStream dataFile;
             byte[] dataFileBytes;
             string dataFileContent;
@@ -306,7 +374,7 @@ namespace SimpleMIPS32InstructionEmulator
                 Regex rgx = new Regex(pattern);
                 dataFileContent = rgx.Replace(dataFileContent, " ");
 
-                int count = 0, address = 2048;
+                int count = 0;
                 StringBuilder tmpSB = new StringBuilder();
                 foreach (var item in dataFileContent)
                 {
@@ -317,8 +385,8 @@ namespace SimpleMIPS32InstructionEmulator
                         if (count == 32)
                         {
                             uint data = ConvertFromBinaryStringToUInt(tmpSB.ToString());
-                            ram.Set4Bit(address, data);
-                            address += 4;
+                            ram.Set4Bit(dataStartAddress, data);
+                            dataStartAddress += 4;
                             count = 0;
                             tmpSB.Clear();
                         }
@@ -486,11 +554,11 @@ namespace SimpleMIPS32InstructionEmulator
                         break;
                     case (0x23):
                         //lw
-                        assemblyCode = String.Format("lw ${0},{1}({2})", rt, immediate, rs);
+                        assemblyCode = String.Format("lw ${0},{1}(${2})", rt, immediate, rs);
                         break;
                     case (0x2B):
                         //sw
-                        assemblyCode = String.Format("sw ${0},{1}({2})", rt, immediate, rs);
+                        assemblyCode = String.Format("sw ${0},{1}(${2})", rt, immediate, rs);
                         break;
                     case (0x04):
                         //beq
@@ -518,6 +586,9 @@ namespace SimpleMIPS32InstructionEmulator
         //TODO test and finish return false
         public bool Execute(uint machineCode)
         {
+            //record PC before
+            uint pcBefore = registers[32].Value;
+
             //execute instruction
             uint op = machineCode >> 26;
             if (op == (0x0))
@@ -590,8 +661,10 @@ namespace SimpleMIPS32InstructionEmulator
                         break;
                     case (0x02):
                         //srl
-                        //TODO  change to logical mode
                         registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)shamt);
+                        int modifier = 1;
+                        modifier = modifier << (int)(31 - shamt);
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rd].Value & modifier);
                         break;
                     case (0x03):
                         //sra
@@ -603,8 +676,10 @@ namespace SimpleMIPS32InstructionEmulator
                         break;
                     case (0x06):
                         //srlv
-                        //TODO  change to logical mode
                         registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)registers[(int)rs].Value);
+                        int modifier_ = 1;
+                        modifier_ = modifier_ << (int)(31 - registers[(int)rs].Value);
+                        registers[(int)rd].Value = (uint)((int)registers[(int)rd].Value & modifier_);
                         break;
                     case (0x07):
                         //srav
@@ -615,20 +690,21 @@ namespace SimpleMIPS32InstructionEmulator
                         registers[32].Value = registers[(int)rs].Value;
                         break;
                     default:
-                        break;
+                        return false;
                 }
             }
             else if (op == (0x2))
             {
                 //J-type instruction j
                 uint address = (machineCode & (0x03FFFFFF)) >> 0;
-                //TODO
+                registers[32].Value = address;
             }
             else if (op == (0x03))
             {
                 //J-type instruction jal
                 uint address = (machineCode & (0x03FFFFFF)) >> 0;
-                //TODO
+                registers[31].Value = registers[32].Value + 4;
+                registers[32].Value = address;
             }
             else
             {
@@ -707,9 +783,16 @@ namespace SimpleMIPS32InstructionEmulator
                         }
                         break;
                     default:
-                        break;
+                        return false;
                 }
             }
+
+            //modify PC
+            if (registers[32].Value == pcBefore)
+            {
+                registers[32].Value += 4;
+            }
+
             return true;
         }
 

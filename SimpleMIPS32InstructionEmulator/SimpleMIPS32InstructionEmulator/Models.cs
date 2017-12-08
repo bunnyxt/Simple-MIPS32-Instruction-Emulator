@@ -131,6 +131,14 @@ namespace SimpleMIPS32InstructionEmulator
             set { assemblyCode = value; OnPropertyChanged(new PropertyChangedEventArgs("AssemblyCode")); }
         }
 
+        private int address;
+
+        public int Address
+        {
+            get { return address; }
+            set { address = value; OnPropertyChanged(new PropertyChangedEventArgs("Address")); }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged(PropertyChangedEventArgs e)

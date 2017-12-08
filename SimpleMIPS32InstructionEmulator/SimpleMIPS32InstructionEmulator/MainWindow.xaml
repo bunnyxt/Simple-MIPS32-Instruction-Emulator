@@ -24,6 +24,8 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -34,17 +36,32 @@
                     <ColumnDefinition Width="8"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Row="0" Grid.Column="0" Name="ImportProgrameButton" Content="导入指令" Click="ImportProgrameButton_Click"/>
-                <Button Grid.Row="0" Grid.Column="2" Name="ImportDataButton" Content="导入数据" Click="ImportDataButton_Click"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="代码段导入地址：" Margin="0,0,0,4"/>
+                <TextBox Grid.Row="0" Grid.Column="2" Text="1024" Name="ProgrameStartAddressTextBox" Margin="0,0,0,4"/>
 
-                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Name="ProgrameFilePathTextBox" IsReadOnly="True" Margin="0,4,0,4"/>
-                <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Name="DataFilePathTextBox" IsReadOnly="True" Margin="0,0,0,4"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="数据段导入地址：" Margin="0,0,0,4"/>
+                <TextBox Grid.Row="1" Grid.Column="2" Text="2048" Name="DataStartAddressTextBox" Margin="0,0,0,4"/>
 
-                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Name="RestartButton" Content="重启模拟" Margin="0,0,0,4" Click="RestartButton_Click"/>
+                <Button Grid.Row="2" Grid.Column="0" Name="ImportProgrameButton" Content="导入指令" Click="ImportProgrameButton_Click"/>
+                <Button Grid.Row="2" Grid.Column="2" Name="ImportDataButton" Content="导入数据" Click="ImportDataButton_Click"/>
 
-                <ListView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="InstructionsListView" Margin="0,0,0,4">
+                <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Name="ProgrameFilePathTextBox" IsReadOnly="True" Margin="0,4,0,4"/>
+                <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Name="DataFilePathTextBox" IsReadOnly="True" Margin="0,0,0,4"/>
+
+                <Button Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Name="RestartButton" Content="重启模拟" Margin="0,0,0,4" Click="RestartButton_Click"/>
+
+                <ListView Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" Name="InstructionsListView" Margin="0,0,0,4">
                     <ListView.View>
                         <GridView>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Address}">
+                                <GridViewColumnHeader>
+                                    <GridViewColumnHeader.ContentTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="地址" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                        </DataTemplate>
+                                    </GridViewColumnHeader.ContentTemplate>
+                                </GridViewColumnHeader>
+                            </GridViewColumn>
                             <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding AssemblyCode}">
                                 <GridViewColumnHeader>
                                     <GridViewColumnHeader.ContentTemplate>
@@ -58,17 +75,17 @@
                     </ListView.View>
                 </ListView>
 
-                <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3"  Orientation="Horizontal" Margin="0,0,0,4">
+                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3"  Orientation="Horizontal" Margin="0,0,0,4">
                     <TextBlock Text="当前执行：" />
                     <TextBlock Name="NowInstructionTextBlock"/>
                 </StackPanel>
 
-                <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"  Orientation="Horizontal" Margin="0,0,0,4">
+                <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3"  Orientation="Horizontal" Margin="0,0,0,4">
                     <TextBlock Text="下一步执行：" />
                     <TextBlock Name="NextInstructionTextBlock"/>
                 </StackPanel>
 
-                <Button Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="3" Name="NextStepButton" Content="下一步" Click="NextStepButton_Click"/>
+                <Button Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" Name="NextStepButton" Content="下一步" Click="NextStepButton_Click"/>
             </Grid>
         </GroupBox>
 
