@@ -16,7 +16,6 @@ namespace SimpleMIPS32InstructionEmulator
         public int Size
         {
             get { return size; }
-            set { size = value; OnPropertyChanged(new PropertyChangedEventArgs("Size")); }
         }
 
         private ObservableCollection<uint> storage;
@@ -24,14 +23,14 @@ namespace SimpleMIPS32InstructionEmulator
         public ObservableCollection<uint> Storage
         {
             get { return storage; }
-            set { storage = value; OnPropertyChanged(new PropertyChangedEventArgs("Storage")); }//So how to trigger event when element in Storage changed??
+            set { storage = value; OnPropertyChanged(new PropertyChangedEventArgs("Storage")); }
         }
 
         public RAM()
         {
-            this.Size = 1048576;//1 MB RAM
+            this.size = 1048576;//1 MB RAM
             this.Storage = new ObservableCollection<uint>();
-            for (int i = 0; i < 262144; i++)
+            for (int i = 0; i < 262144; i++)//262144 = 1048576 / 4
             {
                 this.Storage.Add(new uint());
             }
@@ -63,7 +62,7 @@ namespace SimpleMIPS32InstructionEmulator
 
         public uint Get4Bit(int address)
         {
-            address %= this.Size;//modify those address which exceed max RAM size  
+            address %= this.Size;//modify those address which exceed max RAM size 
             return Storage[address / 4];//index = first address of this 4 Bit / 4
         }
 

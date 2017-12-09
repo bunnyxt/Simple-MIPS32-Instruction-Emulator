@@ -589,7 +589,6 @@ namespace SimpleMIPS32InstructionEmulator
             return assemblyCode;
         }
 
-        //TODO test and finish return false
         public bool Execute(uint machineCode)
         {
             //record PC before
