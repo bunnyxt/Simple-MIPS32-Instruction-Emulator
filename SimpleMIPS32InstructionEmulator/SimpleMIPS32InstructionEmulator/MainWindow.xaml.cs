@@ -514,17 +514,17 @@ namespace SimpleMIPS32InstructionEmulator
                         break;
                 }
             }
-            else if (op == (0x2))
+            else if (op == (0x02))
             {
                 //J-type instruction j
                 uint address = (machineCode & (0x03FFFFFF)) >> 0;
-                assemblyCode = String.Format("j ${0}", address);
+                assemblyCode = String.Format("j {0}", address);
             }
             else if (op == (0x03))
             {
                 //J-type instruction jal
                 uint address = (machineCode & (0x03FFFFFF)) >> 0;
-                assemblyCode = String.Format("jal ${0}", address);
+                assemblyCode = String.Format("jal {0}", address);
             }
             else
             {
@@ -667,8 +667,12 @@ namespace SimpleMIPS32InstructionEmulator
                     case (0x02):
                         //srl
                         registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)shamt);
-                        int modifier = 1;
-                        modifier = modifier << (int)(31 - shamt);
+                        uint modifier = 1;
+                        for (int i = 0; i < 31 - shamt; i++)
+                        {
+                            modifier *= 2;
+                            modifier += 1;
+                        }
                         registers[(int)rd].Value = (uint)((int)registers[(int)rd].Value & modifier);
                         break;
                     case (0x03):
@@ -682,8 +686,12 @@ namespace SimpleMIPS32InstructionEmulator
                     case (0x06):
                         //srlv
                         registers[(int)rd].Value = (uint)((int)registers[(int)rt].Value >> (int)registers[(int)rs].Value);
-                        int modifier_ = 1;
-                        modifier_ = modifier_ << (int)(31 - registers[(int)rs].Value);
+                        uint modifier_ = 1;
+                        for (int i = 0; i < 31 - shamt; i++)
+                        {
+                            modifier_ *= 2;
+                            modifier_ += 1;
+                        }
                         registers[(int)rd].Value = (uint)((int)registers[(int)rd].Value & modifier_);
                         break;
                     case (0x07):
@@ -698,7 +706,7 @@ namespace SimpleMIPS32InstructionEmulator
                         return false;
                 }
             }
-            else if (op == (0x2))
+            else if (op == (0x02))
             {
                 //J-type instruction j
                 uint address = (machineCode & (0x03FFFFFF)) >> 0;
